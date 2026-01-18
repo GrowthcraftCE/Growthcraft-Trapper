@@ -1,27 +1,26 @@
 modLoader = "javafml"
 loaderVersion = "[49,)"
 license = "GNU General Public License v3.0"
-issueTrackerURL = "https://github.com/GrowthcraftCE/Growthcraft-Trapper/issues"
+issueTrackerURL = "https://github.com/growthcraft/trapper/issues"
 
 [[mods]]
-modId = "${mod_id}"
+id = "growthcrafttrapper"
 version = "${mod_version}"
 displayName = "${mod_name}"
-updateJSONURL = "https://raw.githubusercontent.com/GrowthcraftCE/Growthcraft-Updates/master/growthcraft-trapper-versions.json"
-displayURL = "https://github.com/GrowthcraftCE/Growthcraft-Trapper/wiki"
-logoFile = "growthcraft_trapper_logo.png"
-credits = "Thanks to Gwafu for starting a great mod. And the Growthcraft CE Development for continuing the work."
-authors = "${mod_authors}"
 description = '''${mod_description}'''
+authors = ["${mod_authors}"]
+updateJSONURL = ""
+screenshots = []
+logoFile = ""
 
-[[dependencies.${ mod_id }]]
-modId = "forge"
+[[dependencies.growthcrafttrapper]]
+modId = "neoforge"
 mandatory = true
 versionRange = "${forge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${ mod_id }]]
+[[dependencies.growthcrafttrapper]]
 modId = "minecraft"
 mandatory = true
 versionRange = "${minecraft_version_range}"
