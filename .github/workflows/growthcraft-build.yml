@@ -44,22 +44,11 @@ jobs:
       - name: Setup Gradle
         run: chmod +x gradlew
 
-      - name: Verify SONAR_TOKEN is present
-        shell: bash
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          if [ -z "$SONAR_TOKEN" ]; then
-            echo "SONAR_TOKEN is NOT set in this workflow context."
-            exit 1
-          fi
-          echo "SONAR_TOKEN is set (length=${#SONAR_TOKEN})."
-
       - name: Build and Analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonar --info -Dsonar.token="$SONAR_TOKEN"
+        run: ./gradlew build
 
       - name: GitHub Release
         uses: fnkr/github-action-ghr@v1
