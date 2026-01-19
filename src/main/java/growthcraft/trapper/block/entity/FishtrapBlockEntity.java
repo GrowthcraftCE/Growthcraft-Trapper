@@ -1,7 +1,7 @@
 package growthcraft.trapper.block.entity;
 
+import com.mojang.authlib.GameProfile;
 import growthcraft.trapper.GrowthcraftTrapper;
-import growthcraft.trapper.block.FishtrapBlock;
 import growthcraft.trapper.init.GrowthcraftTrapperBlockEntities;
 import growthcraft.trapper.init.GrowthcraftTrapperTags;
 import growthcraft.trapper.init.config.GrowthcraftTrapperConfig;
@@ -31,7 +31,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -41,7 +40,8 @@ import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
@@ -51,11 +51,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicker<FishtrapBlockEntity>, MenuProvider {
 
     private final int minTickFishing = TickUtils.toTicks(GrowthcraftTrapperConfig.getMinTickFishingInMinutes(), "minutes");
     private final int maxTickFishing = TickUtils.toTicks(GrowthcraftTrapperConfig.getMaxTickFishingInMinutes(), "minutes");
+
+    private static final UUID FISHTRAP_FAKEPLAYER_UUID = UUID.fromString("f5d6b9b9-2d11-4b2d-9aa0-8b2c2f2f6c5b");
+    private static final GameProfile FISHTRAP_FAKEPLAYER_PROFILE = new GameProfile(FISHTRAP_FAKEPLAYER_UUID, "[GrowthcraftTrapper-Fishtrap]");
+
     private final ItemStackHandler itemStackHandler = new ItemStackHandler(7) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -138,7 +143,7 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
             this.doFishing(blockPos);
             tickTimer = 0;
             tickCooldown = TickUtils.getRandomTickCooldown(minTickFishing, maxTickFishing);
-        } else if(tickCooldown == 0 && canDoFishing(level,blockPos)) {
+        } else if (tickCooldown == 0 && canDoFishing(level, blockPos)) {
             tickCooldown = TickUtils.getRandomTickCooldown(minTickFishing, maxTickFishing);
         }
     }
@@ -179,6 +184,7 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
 
     private void doFishing(BlockPos blockPos) {
         if (level == null) return;
+        final ServerLevel serverLevel = (ServerLevel) level;
 
         // Check for any bait in slot 0
         ItemStack baitItemStack = itemStackHandler.getStackInSlot(0);
@@ -205,10 +211,14 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
             lootTable = lootDataManager.getElement(LootDataType.TABLE, BuiltInLootTables.FISHING_JUNK);
         }
 
-        LootParams lootContext = new LootParams.Builder((ServerLevel) level)
+        // Porting Note - NeoForge validates that FISHING requires KILLER_ENTITY; fishtraps have no real player, so use a FakePlayer.
+        final FakePlayer fakePlayer = FakePlayerFactory.get(serverLevel, FISHTRAP_FAKEPLAYER_PROFILE);
+
+        LootParams lootContext = new LootParams.Builder(serverLevel)
                 .withLuck(luck)
-                .withParameter(LootContextParams.ORIGIN, new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()))
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockPos))
                 .withParameter(LootContextParams.TOOL, fishingRod)
+                .withParameter(LootContextParams.KILLER_ENTITY, fakePlayer)
                 .create(LootContextParamSets.FISHING);
 
         List<ItemStack> lootItemStacks = lootTable.getRandomItems(lootContext);
