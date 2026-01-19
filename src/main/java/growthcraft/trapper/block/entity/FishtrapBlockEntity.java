@@ -41,11 +41,9 @@ import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,41 +73,45 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
 
     private int tickTimer = 0;
     private int tickCooldown = 0;
-    private LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.empty();
 
-    private final Map<Direction, LazyOptional<WrappedInventoryHandler>> directionWrappedHandlerMap =
+    private final Map<Direction, WrappedInventoryHandler> directionWrappedHandlerMap =
             Map.of(
-                    Direction.UP, LazyOptional.of(() -> new WrappedInventoryHandler(
+                    Direction.UP, new WrappedInventoryHandler(
                             itemStackHandler,
                             (index) -> index == 0,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack))
+                            (index, stack) -> itemStackHandler.isItemValid(0, stack)
                     ),
-                    Direction.DOWN, LazyOptional.of(() -> new WrappedInventoryHandler(
+                    Direction.DOWN, new WrappedInventoryHandler(
                             itemStackHandler,
                             (i) -> i >= 1,
-                            (i, s) -> false)
+                            (i, s) -> false
                     ),
-                    Direction.NORTH, LazyOptional.of(() -> new WrappedInventoryHandler(
+                    Direction.NORTH, new WrappedInventoryHandler(
                             itemStackHandler,
                             (index) -> index == 0,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack))
+                            (index, stack) -> itemStackHandler.isItemValid(0, stack)
                     ),
-                    Direction.SOUTH, LazyOptional.of(() -> new WrappedInventoryHandler(
+                    Direction.SOUTH, new WrappedInventoryHandler(
                             itemStackHandler,
                             (index) -> index == 0,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack))
+                            (index, stack) -> itemStackHandler.isItemValid(0, stack)
                     ),
-                    Direction.EAST, LazyOptional.of(() -> new WrappedInventoryHandler(
+                    Direction.EAST, new WrappedInventoryHandler(
                             itemStackHandler,
                             (index) -> index == 0,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack))
+                            (index, stack) -> itemStackHandler.isItemValid(0, stack)
                     ),
-                    Direction.WEST, LazyOptional.of(() -> new WrappedInventoryHandler(
+                    Direction.WEST, new WrappedInventoryHandler(
                             itemStackHandler,
                             (index) -> index == 0,
-                            (index, stack) -> itemStackHandler.isItemValid(0, stack))
+                            (index, stack) -> itemStackHandler.isItemValid(0, stack)
                     )
             );
+
+    public IItemHandler getItemHandler(@Nullable Direction side) {
+        if (side == null) return itemStackHandler;
+        return directionWrappedHandlerMap.get(side);
+    }
 
     private Component customName;
 
@@ -262,13 +264,6 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
     @Override
     public void onLoad() {
         super.onLoad();
-        itemHandlerLazyOptional = LazyOptional.of(() -> itemStackHandler);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        itemHandlerLazyOptional.invalidate();
     }
 
     @Override
@@ -291,19 +286,6 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new FishtrapMenu(containerId, inventory, this);
-    }
-
-    @NotNull
-    @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            if(side == null) return itemHandlerLazyOptional.cast();
-
-            if(directionWrappedHandlerMap.containsKey(side)) {
-                return directionWrappedHandlerMap.get(side).cast();
-            }
-        }
-        return super.getCapability(cap, side);
     }
 
     public void dropItems() {

@@ -8,103 +8,102 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class GrowthcraftTrapperBlocks {
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Reference.MODID);
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Reference.MODID);
 
-    public static final RegistryObject<Block> ANIMAL_TRAP_COPPER = registerBlock(
+    public static final DeferredBlock<Block> ANIMAL_TRAP_COPPER = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_COPPER,
             () -> new AnimalTrapBlock(1)
     );
-    public static final RegistryObject<Block> ANIMAL_TRAP_DIAMOND = registerBlock(
+    public static final DeferredBlock<Block> ANIMAL_TRAP_DIAMOND = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_DIAMOND,
             () -> new AnimalTrapBlock(4)
     );
-    public static final RegistryObject<Block> ANIMAL_TRAP_GOLD = registerBlock(
+    public static final DeferredBlock<Block> ANIMAL_TRAP_GOLD = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_GOLD,
             () -> new AnimalTrapBlock(3)
     );
-    public static final RegistryObject<Block> ANIMAL_TRAP_IRON = registerBlock(
+    public static final DeferredBlock<Block> ANIMAL_TRAP_IRON = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_IRON,
             () -> new AnimalTrapBlock(2)
     );
 
-    public static final RegistryObject<Block> FISHTRAP_OAK = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_OAK = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_OAK,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_ACACIA = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_ACACIA = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_ACACIA,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_DARK_OAK = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_DARK_OAK = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_DARK_OAK,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_BIRCH = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_BIRCH = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_BIRCH,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_SPRUCE = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_SPRUCE = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_SPRUCE,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_JUNGLE = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_JUNGLE = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_JUNGLE,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_BAMBOO = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_BAMBOO = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_BAMBOO,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_CHERRY = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_CHERRY = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_CHERRY,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_CRIMSON = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_CRIMSON = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_CRIMSON,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_MANGROVE = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_MANGROVE = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_MANGROVE,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> FISHTRAP_WARPED = registerBlock(
+    public static final DeferredBlock<Block> FISHTRAP_WARPED = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_WARPED,
             FishtrapBlock::new
     );
 
-    public static final RegistryObject<Block> SPAWNEGGTRAP = registerBlock(
+    public static final DeferredBlock<Block> SPAWNEGGTRAP = registerBlock(
             Reference.UnlocalizedName.SPAWNEGGTRAP,
             SpawnEggTrapBlock::new
     );
 
-    private static RegistryObject<Block> registerBlock(String name, Supplier<Block> block) {
-        RegistryObject<Block> registryObject = BLOCKS.register(name, block);
+    private static DeferredBlock<Block> registerBlock(String name, Supplier<Block> block) {
+        DeferredBlock<Block> registryObject = BLOCKS.register(name, block);
         if (!excludeBlockItemRegistry(registryObject.getId())) {
             registerBlockItem(name, registryObject);
         }
         return registryObject;
     }
 
-    private static void registerBlockItem(String unlocalizedName, RegistryObject<Block> blockRegistryObject) {
+    private static void registerBlockItem(String unlocalizedName, DeferredBlock<Block> blockRegistryObject) {
         GrowthcraftTrapperItems.ITEMS.register(unlocalizedName, () -> new BlockItem(blockRegistryObject.get(), getDefaultItemProperties()));
     }
 

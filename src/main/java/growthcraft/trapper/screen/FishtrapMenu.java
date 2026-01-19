@@ -13,8 +13,9 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class FishtrapMenu extends AbstractContainerMenu {
 
@@ -40,15 +41,15 @@ public class FishtrapMenu extends AbstractContainerMenu {
         addPlayerHotbar(inventory);
 
         // Add our block's inventory slots.
-        this.fishtrapBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
-                    // 1 Input Slot
-                    this.addSlot(new SlotItemHandler(handler, 0, 17, 20));
-                    // 6 Output Slots
-                    for (int i = 0; i < 6; i++) {
-                        this.addSlot(new ResultSlot(handler, i + 1, 44 + (i * 18), 20));
-                    }
-                }
-        );
+        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, fishtrapBlockEntity.getBlockPos(), null);
+        if (handler != null) {
+            // 1 Input Slot
+            this.addSlot(new SlotItemHandler(handler, 0, 17, 20));
+            // 6 Output Slots
+            for (int i = 0; i < 6; i++) {
+                this.addSlot(new ResultSlot(handler, i + 1, 44 + (i * 18), 20));
+            }
+        }
     }
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons

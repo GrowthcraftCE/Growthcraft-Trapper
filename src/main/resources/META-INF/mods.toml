@@ -1,10 +1,10 @@
 modLoader = "javafml"
-loaderVersion = "[49,)"
+loaderVersion = "${loader_version_range}"
 license = "GNU General Public License v3.0"
 issueTrackerURL = "https://github.com/growthcraft/trapper/issues"
 
 [[mods]]
-id = "growthcrafttrapper"
+modId = "growthcraft_trapper"
 version = "${mod_version}"
 displayName = "${mod_name}"
 description = '''${mod_description}'''
@@ -13,16 +13,16 @@ updateJSONURL = ""
 screenshots = []
 logoFile = ""
 
-[[dependencies.growthcrafttrapper]]
+[[dependencies.growthcraft_trapper]]
 modId = "neoforge"
-mandatory = true
-versionRange = "${forge_version_range}"
+type = "required"
+versionRange = "${neo_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.growthcrafttrapper]]
+[[dependencies.growthcraft_trapper]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"

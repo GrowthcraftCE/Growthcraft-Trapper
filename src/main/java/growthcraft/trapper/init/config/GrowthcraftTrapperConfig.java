@@ -2,15 +2,15 @@ package growthcraft.trapper.init.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.File;
 
 public class GrowthcraftTrapperConfig {
 
-    public static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SERVER;
+    public static final ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
+    public static final ModConfigSpec SERVER;
 
     public static final String SERVER_CONFIG = "growthcraft-trapper-server.toml";
 
@@ -18,13 +18,13 @@ public class GrowthcraftTrapperConfig {
     private static final String CATEGORY_FISHTRAP = "fishtrap";
     private static final String CATEGORY_SPAWNEGGTRAP = "spawneggtrap";
 
-    private static ForgeConfigSpec.BooleanValue debugEnbabled;
+    private static ModConfigSpec.BooleanValue debugEnbabled;
 
 
-    private static ForgeConfigSpec.IntValue minTickFishingInMinutes;
-    private static ForgeConfigSpec.IntValue maxTickFishingInMinutes;
-    private static ForgeConfigSpec.IntValue minTickTrappingInMinutes;
-    private static ForgeConfigSpec.IntValue maxTickTrappingInMinutes;
+    private static ModConfigSpec.IntValue minTickFishingInMinutes;
+    private static ModConfigSpec.IntValue maxTickFishingInMinutes;
+    private static ModConfigSpec.IntValue minTickTrappingInMinutes;
+    private static ModConfigSpec.IntValue maxTickTrappingInMinutes;
 
     static {
         initServerConfig(SERVER_BUILDER);
@@ -39,7 +39,7 @@ public class GrowthcraftTrapperConfig {
         loadConfig(SERVER, FMLPaths.CONFIGDIR.get().resolve(SERVER_CONFIG).toString());
     }
 
-    public static void loadConfig(ForgeConfigSpec configSpec, String path) {
+    public static void loadConfig(ModConfigSpec configSpec, String path) {
         final CommentedFileConfig fileConfig = CommentedFileConfig.builder(
                 new File(path)).sync().autosave().writingMode(WritingMode.REPLACE).build();
 
@@ -47,7 +47,7 @@ public class GrowthcraftTrapperConfig {
         configSpec.setConfig(fileConfig);
     }
 
-    public static void initServerConfig(ForgeConfigSpec.Builder specBuilder) {
+    public static void initServerConfig(ModConfigSpec.Builder specBuilder) {
         debugEnbabled = specBuilder
                 .comment("Set to true to enable debug logging.")
                 .define(String.format("%s.%s", CATEGORY_GENERAL, "enableDebugLogging"), false);

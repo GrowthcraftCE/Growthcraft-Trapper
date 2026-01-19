@@ -5,30 +5,30 @@ import growthcraft.trapper.shared.Reference;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.network.IContainerFactory;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.network.IContainerFactory;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class GrowthcraftTrapperMenus {
 
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(
-            ForgeRegistries.MENU_TYPES, Reference.MODID
+            Registries.MENU, Reference.MODID
     );
 
-    public static final RegistryObject<MenuType<AnimalTrapMenu>> ANIMAL_TRAP_MENU =
+    public static final DeferredHolder<MenuType<?>, MenuType<AnimalTrapMenu>> ANIMAL_TRAP_MENU =
             registerMenuType(Reference.UnlocalizedName.ANIMAL_TRAP_CONTAINER, AnimalTrapMenu::new);
 
-    public static final RegistryObject<MenuType<FishtrapMenu>> FISHTRAP_MENU =
+    public static final DeferredHolder<MenuType<?>, MenuType<FishtrapMenu>> FISHTRAP_MENU =
             registerMenuType(Reference.UnlocalizedName.FISHTRAP, FishtrapMenu::new);
 
-    public static final RegistryObject<MenuType<SpawnEggTrapMenu>> SPAWNEGGTRAP_MENU =
+    public static final DeferredHolder<MenuType<?>, MenuType<SpawnEggTrapMenu>> SPAWNEGGTRAP_MENU =
             registerMenuType(Reference.UnlocalizedName.SPAWNEGGTRAP, SpawnEggTrapMenu::new);
 
-    private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(
+    private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(
             String name, IContainerFactory<T> factory) {
-        return MENUS.register(name, () -> IForgeMenuType.create(factory));
+        return MENUS.register(name, () -> IMenuTypeExtension.create(factory));
     }
 
     public static void registerMenus() {
