@@ -14,6 +14,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,7 @@ public class GrowthcraftTrapper {
         EVENT_BUS.addListener(this::onServerStarting);
         modEventBus.addListener(this::clientSetupEvent);
         modEventBus.addListener(this::registerCapabilities);
+        modEventBus.addListener(this::registerScreens);
 
         GrowthcraftTrapperConfig.loadConfig();
 
@@ -39,6 +41,10 @@ public class GrowthcraftTrapper {
         GrowthcraftTrapperMenus.MENUS.register(modEventBus);
 
         GrowthcraftTrapperCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
+    }
+
+    private void registerScreens(RegisterMenuScreensEvent event) {
+        GrowthcraftTrapperMenus.registerMenus(event);
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
@@ -65,7 +71,6 @@ public class GrowthcraftTrapper {
 
     private void clientSetupEvent(final FMLClientSetupEvent event) {
         GrowthcraftTrapperBlockRenders.registerBlockRenders();
-        GrowthcraftTrapperMenus.registerMenus();
     }
 
     @net.neoforged.bus.api.SubscribeEvent

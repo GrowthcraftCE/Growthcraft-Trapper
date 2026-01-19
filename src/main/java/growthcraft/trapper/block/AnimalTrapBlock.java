@@ -12,8 +12,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -57,7 +59,32 @@ public class AnimalTrapBlock extends BaseEntityBlock implements SimpleWaterlogge
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
+
+        if (!(blockEntity instanceof AnimalTrapBlockEntity animalTrapBlockEntity))
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+
+        if (level.isClientSide)
+            return ItemInteractionResult.SUCCESS;
+
+        try {
+            // Play sound
+            level.playSound(player, blockPos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+            // Open the Menu Container
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.openMenu(animalTrapBlockEntity, blockPos);
+            }
+        } catch (Exception ex) {
+            GrowthcraftTrapper.LOGGER.error(String.format("%s unable to open AnimalTrapBlockEntity GUI at %s.", player.getDisplayName().getString(), blockPos));
+            GrowthcraftTrapper.LOGGER.error(ex.getMessage());
+        }
+
+        return ItemInteractionResult.CONSUME;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
         if (!(blockEntity instanceof AnimalTrapBlockEntity animalTrapBlockEntity))

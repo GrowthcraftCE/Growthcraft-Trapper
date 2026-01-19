@@ -31,10 +31,10 @@ public class GrowthcraftTrapperMenus {
         return MENUS.register(name, () -> IMenuTypeExtension.create(factory));
     }
 
-    public static void registerMenus() {
-        MenuScreens.register(ANIMAL_TRAP_MENU.get(), AnimalTrapScreen::new);
-        MenuScreens.register(FISHTRAP_MENU.get(), FishtrapScreen::new);
-        MenuScreens.register(SPAWNEGGTRAP_MENU.get(), SpawnEggTrapScreen::new);
+    public static void registerMenus(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        event.register(ANIMAL_TRAP_MENU.get(), AnimalTrapScreen::new);
+        event.register(FISHTRAP_MENU.get(), FishtrapScreen::new);
+        event.register(SPAWNEGGTRAP_MENU.get(), SpawnEggTrapScreen::new);
     }
 
 }

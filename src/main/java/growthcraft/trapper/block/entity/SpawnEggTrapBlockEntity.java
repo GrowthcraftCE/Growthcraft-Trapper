@@ -10,6 +10,7 @@ import growthcraft.trapper.screen.SpawnEggTrapMenu;
 import growthcraft.trapper.shared.Reference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -158,10 +159,10 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
 
     private void doTrapping(@NotNull BlockPos blockPos) {
         if (level == null) return;
+        final ServerLevel serverLevel = (ServerLevel) level;
 
         ItemStack baitItemStack = itemStackHandler.getStackInSlot(0);
 
-        LootDataManager lootDataManager = Objects.requireNonNull(level.getServer()).getLootData();
         LootTable lootTable;
 
         String lootTableType = "";
@@ -175,17 +176,17 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
 
         switch (lootTableType) {
             case "wheat":
-                lootTable = lootDataManager.getElement(LootDataType.TABLE, Reference.LootTables.SPAWNEGGTRAP_WHEAT);
+                lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(Reference.LootTables.SPAWNEGGTRAP_WHEAT);
                 break;
             default:
-                lootTable = lootDataManager.getElement(LootDataType.TABLE, BuiltInLootTables.EMPTY);
+                lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.EMPTY);
         }
 
         // If loot table is null, fail now.
         if (lootTable == null) return;
 
-        LootParams lootContext = new LootParams.Builder((ServerLevel) level)
-                .withParameter(LootContextParams.ORIGIN, new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()))
+        LootParams lootContext = new LootParams.Builder(serverLevel)
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockPos))
                 .create(LootContextParamSets.EMPTY);
 
         List<ItemStack> lootItemStacks = lootTable.getRandomItems(lootContext);
@@ -221,46 +222,26 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.serializeNBT();
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        this.load(tag);
-    }
-
-    @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        itemStackHandler.deserializeNBT(nbt.getCompound("inventory"));
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.loadAdditional(nbt, registries);
+        itemStackHandler.deserializeNBT(registries, nbt.getCompound("inventory"));
         this.tickTimer = nbt.getInt("tickTimer");
         this.tickCooldown = nbt.getInt("tickCooldown");
 
         if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
+            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"), registries);
         }
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        this.load(pkt.getTag());
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag nbt) {
-        nbt.put("inventory", itemStackHandler.serializeNBT());
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.saveAdditional(nbt, registries);
+        nbt.put("inventory", itemStackHandler.serializeNBT(registries));
         nbt.putInt("tickTimer", this.tickTimer);
         nbt.putInt("tickCooldown", this.tickCooldown);
         if (this.customName != null) {
-            nbt.putString("CustomName", Component.Serializer.toJson(this.customName));
+            nbt.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
         }
-        super.saveAdditional(nbt);
     }
 
     @Override

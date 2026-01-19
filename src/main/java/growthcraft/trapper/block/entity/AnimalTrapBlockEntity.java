@@ -12,6 +12,7 @@ import growthcraft.trapper.shared.Reference;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -171,7 +172,6 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
 
         ItemStack baitItemStack = itemStackHandler.getStackInSlot(0);
 
-        LootDataManager lootDataManager = Objects.requireNonNull(level.getServer()).getLootData();
         LootTable lootTable;
 
         String lootTableType = "";
@@ -179,23 +179,23 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
         // Depending on the bait that was used, determines what gets caught.
         if (baitItemStack.is(Tags.Items.CROPS_WHEAT)) {
             lootTableType = "wheat";
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, Reference.LootTables.ANIMAL_TRAP_WHEAT);
+            lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_WHEAT);
         } else if (baitItemStack.is(Tags.Items.CROPS_CARROT)) {
             lootTableType = "carrot";
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, Reference.LootTables.ANIMAL_TRAP_CARROT);
+            lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_CARROT);
         } else if (baitItemStack.is(Tags.Items.SEEDS_WHEAT)) {
             lootTableType = "seeds_wheat";
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, Reference.LootTables.ANIMAL_TRAP_SEEDS);
+            lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_SEEDS);
         } else if (baitItemStack.is(ItemTags.LEAVES)) {
             lootTableType = "leaves";
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, Reference.LootTables.ANIMAL_TRAP_LEAVES);
+            lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_LEAVES);
         } else {
             lootTableType = "invalid_bait";
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, BuiltInLootTables.EMPTY);
+            lootTable = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.EMPTY);
         }
 
         GrowthcraftTrapper.LOGGER.debug(
-                String.format("AnimalTrapBlockEntity [%s] - doTrapping - Bait [%s], LootTableType [%s].", blockPos.toShortString(), baitItemStack, lootTable.getLootTableId())
+                String.format("AnimalTrapBlockEntity [%s] - doTrapping - Bait [%s], LootTableType [%s].", blockPos.toShortString(), baitItemStack, lootTable)
         );
 
         // If loot table is null, fail now.
@@ -238,46 +238,33 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.serializeNBT();
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        this.load(tag);
-    }
-
-    @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        itemStackHandler.deserializeNBT(nbt.getCompound("inventory"));
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.loadAdditional(nbt, registries);
+        itemStackHandler.deserializeNBT(registries, nbt.getCompound("inventory"));
         this.tickTimer = nbt.getInt("tickTimer");
         this.tickCooldown = nbt.getInt("tickCooldown");
 
         if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
+            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"), registries);
         }
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        this.load(pkt.getTag());
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag nbt) {
-        nbt.put("inventory", itemStackHandler.serializeNBT());
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.saveAdditional(nbt, registries);
+        nbt.put("inventory", itemStackHandler.serializeNBT(registries));
         nbt.putInt("tickTimer", this.tickTimer);
         nbt.putInt("tickCooldown", this.tickCooldown);
         if (this.customName != null) {
-            nbt.putString("CustomName", Component.Serializer.toJson(this.customName));
+            nbt.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
         }
-        super.saveAdditional(nbt);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        this.saveAdditional(tag, registries);
+        return tag;
     }
 
     @Override

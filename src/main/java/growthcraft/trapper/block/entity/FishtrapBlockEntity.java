@@ -11,12 +11,16 @@ import growthcraft.trapper.lib.utils.TickUtils;
 import growthcraft.trapper.screen.FishtrapMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,6 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -189,8 +194,6 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
         // Check for any bait in slot 0
         ItemStack baitItemStack = itemStackHandler.getStackInSlot(0);
 
-        LootDataManager lootDataManager = Objects.requireNonNull(level.getServer()).getLootData();
-
         LootTable lootTable;
 
         int luck = 0;
@@ -200,15 +203,15 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
 
         if (baitItemStack.is(GrowthcraftTrapperTags.Items.FISHTRAP_BAIT_FORTUNE)) {
             luck = 3;
-            fishingRod.enchant(Enchantments.FISHING_LUCK, luck);
+            fishingRod.enchant(serverLevel.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, new ResourceLocation("minecraft", "luck_of_the_sea"))).value(), luck);
             // Fish from the Treasure Loot Table
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, BuiltInLootTables.FISHING_TREASURE);
+            lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING_TREASURE);
         } else if (baitItemStack.is(GrowthcraftTrapperTags.Items.FISHTRAP_BAIT)) {
             // Fish from the Standard Loot Table
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, BuiltInLootTables.FISHING);
+            lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING);
         } else {
             // Fish from the Junk Loot Table
-            lootTable = lootDataManager.getElement(LootDataType.TABLE, BuiltInLootTables.FISHING_JUNK);
+            lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING_JUNK);
         }
 
         // Porting Note - NeoForge validates that FISHING requires KILLER_ENTITY; fishtraps have no real player, so use a FakePlayer.
@@ -246,45 +249,25 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.serializeNBT();
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        this.load(tag);
-    }
-
-    @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        itemStackHandler.deserializeNBT(nbt.getCompound("inventory"));
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.loadAdditional(nbt, registries);
+        itemStackHandler.deserializeNBT(registries, nbt.getCompound("inventory"));
         this.tickTimer = nbt.getInt("tickTimer");
         this.tickCooldown = nbt.getInt("tickCooldown");
         if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
+            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"), registries);
         }
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        this.load(pkt.getTag());
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag nbt) {
-        nbt.put("inventory", itemStackHandler.serializeNBT());
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.saveAdditional(nbt, registries);
+        nbt.put("inventory", itemStackHandler.serializeNBT(registries));
         nbt.putInt("tickTimer", this.tickTimer);
         nbt.putInt("tickCooldown", this.tickCooldown);
         if (this.customName != null) {
-            nbt.putString("CustomName", Component.Serializer.toJson(this.customName));
+            nbt.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
         }
-        super.saveAdditional(nbt);
     }
 
     @Override
