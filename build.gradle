@@ -29,7 +29,7 @@ sonarqube {
     }
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 println('========================================')
 println('Java: ' + System.getProperty('java.version'))
