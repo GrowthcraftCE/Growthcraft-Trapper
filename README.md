@@ -2,7 +2,7 @@
 
 # Growthcraft Trapper 1.20.4 for Minecraft 1.20.4 (NeoForge)
 
-[![Version](https://img.shields.io/badge/Growthcraft-8.1.0-orange.svg)](https://github.com/GrowthcraftCE/Growthcraft-Trapper)
+[![Version](https://img.shields.io/badge/Growthcraft_Trapper-1.20.4.1-orange.svg)](https://github.com/GrowthcraftCE/Growthcraft-Trapper)
 [![](http://cf.way2muchnoise.eu/versions/growthcraft-community-edition_latest.svg)](https://minecraft.curseforge.com/projects/growthcraft-community-edition/)
 [![](http://cf.way2muchnoise.eu/short_growthcraft-community-edition.svg)](https://minecraft.curseforge.com/projects/growthcraft-community-edition/)
 [![Discord](https://img.shields.io/discord/333690296334548994.svg?color=green)](https://discord.gg/Quh76Jn)
@@ -15,11 +15,15 @@ it is its own mod, we are extending it to more than just fish.
 [Growthcraft Master Roadmap](https://app.zenhub.com/workspaces/growthcraft-6043ce571b094900102f4ca6/board)
 
 ### Curse Forge
+* [Growthcraft Trapper](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper)
 
+### Minecraft 1.20
+* [Growthcraft Trapper 1.20.4-neo](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.20.4-neo)
+
+### Minecraft 1.19
 * [Growthcraft Trapper](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper)
 
 ### Minecraft 1.19
-
 * [Growthcraft Trapper 8](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.19)
 * End of Support: TBD
 
