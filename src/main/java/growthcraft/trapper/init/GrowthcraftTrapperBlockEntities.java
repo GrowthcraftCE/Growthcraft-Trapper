@@ -17,7 +17,7 @@ public class GrowthcraftTrapperBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FishtrapBlockEntity>> FISHTRAP_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             Reference.UnlocalizedName.FISHTRAP,
-            () -> BlockEntityType.Builder.of(FishtrapBlockEntity::new,
+            () -> new BlockEntityType<>(FishtrapBlockEntity::new,
                     GrowthcraftTrapperBlocks.FISHTRAP_BIRCH.get(),
                     GrowthcraftTrapperBlocks.FISHTRAP_ACACIA.get(),
                     GrowthcraftTrapperBlocks.FISHTRAP_DARK_OAK.get(),
@@ -30,24 +30,24 @@ public class GrowthcraftTrapperBlockEntities {
                     GrowthcraftTrapperBlocks.FISHTRAP_MANGROVE.get(),
                     GrowthcraftTrapperBlocks.FISHTRAP_WARPED.get()
 
-            ).build(null)
+            )
     );
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnimalTrapBlockEntity>> ANIMAL_TRAP_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             Reference.UnlocalizedName.ANIMAL_TRAP,
-            () -> BlockEntityType.Builder.of(AnimalTrapBlockEntity::new,
+            () -> new BlockEntityType<>(AnimalTrapBlockEntity::new,
                     GrowthcraftTrapperBlocks.ANIMAL_TRAP_IRON.get(),
                     GrowthcraftTrapperBlocks.ANIMAL_TRAP_COPPER.get(),
                     GrowthcraftTrapperBlocks.ANIMAL_TRAP_GOLD.get(),
                     GrowthcraftTrapperBlocks.ANIMAL_TRAP_DIAMOND.get()
-            ).build(null)
+            )
     );
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SpawnEggTrapBlockEntity>> SPAWNEGGTRAP_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             Reference.UnlocalizedName.SPAWNEGGTRAP,
-            () -> BlockEntityType.Builder.of(SpawnEggTrapBlockEntity::new,
+            () -> new BlockEntityType<>(SpawnEggTrapBlockEntity::new,
                     GrowthcraftTrapperBlocks.SPAWNEGGTRAP.get()
-            ).build(null)
+            )
     );
 
     private GrowthcraftTrapperBlockEntities() {

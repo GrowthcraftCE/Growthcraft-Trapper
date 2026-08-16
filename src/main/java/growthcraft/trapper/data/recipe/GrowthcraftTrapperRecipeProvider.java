@@ -8,7 +8,10 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -17,13 +20,12 @@ import java.util.concurrent.CompletableFuture;
 
 public class GrowthcraftTrapperRecipeProvider extends RecipeProvider {
 
-    public GrowthcraftTrapperRecipeProvider(PackOutput output,
-                                             CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider);
+    public GrowthcraftTrapperRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+        super(registries, output);
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput output) {
+    protected void buildRecipes() {
         addFishtrap(output, GrowthcraftTrapperBlocks.FISHTRAP_ACACIA.get(), Items.ACACIA_PLANKS);
         addFishtrap(output, GrowthcraftTrapperBlocks.FISHTRAP_BAMBOO.get(), Items.BAMBOO_PLANKS);
         addFishtrap(output, GrowthcraftTrapperBlocks.FISHTRAP_BIRCH.get(), Items.BIRCH_PLANKS);
@@ -44,22 +46,22 @@ public class GrowthcraftTrapperRecipeProvider extends RecipeProvider {
         addSpawnEggTrap(output);
     }
 
-    private static void addFishtrap(RecipeOutput output, ItemLike result, Item material) {
+    private void addFishtrap(RecipeOutput output, ItemLike result, Item material) {
         addTrap(output, result, material, Items.LEAD, Items.STRING, "fishtrap");
     }
 
-    private static void addAnimalTrap(RecipeOutput output, ItemLike result, Item material) {
+    private void addAnimalTrap(RecipeOutput output, ItemLike result, Item material) {
         addTrap(output, result, material, Items.BUCKET, Items.IRON_BARS, "animal_trap");
     }
 
-    private static void addSpawnEggTrap(RecipeOutput output) {
+    private void addSpawnEggTrap(RecipeOutput output) {
         addTrap(output, GrowthcraftTrapperBlocks.SPAWNEGGTRAP.get(), Items.NETHERITE_INGOT,
                 Items.BUCKET, Items.IRON_BARS, "spawn_egg_trap");
     }
 
-    private static void addTrap(RecipeOutput output, ItemLike result, Item material,
+    private void addTrap(RecipeOutput output, ItemLike result, Item material,
                                 Item center, Item corners, String group) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, result)
+        shaped(RecipeCategory.MISC, result)
                 .pattern("ACA")
                 .pattern("CBC")
                 .pattern("ACA")
@@ -68,8 +70,24 @@ public class GrowthcraftTrapperRecipeProvider extends RecipeProvider {
                 .define('C', corners)
                 .group(group)
                 .unlockedBy(getHasName(material), has(material))
-                .save(output, ResourceLocation.fromNamespaceAndPath(
+                .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(
                         Reference.MODID,
-                        net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.asItem()).getPath()));
+                        net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.asItem()).getPath())));
+    }
+
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+            super(output, lookupProvider);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+            return new GrowthcraftTrapperRecipeProvider(registries, output);
+        }
+
+        @Override
+        public String getName() {
+            return "Growthcraft Trapper Recipes";
+        }
     }
 }

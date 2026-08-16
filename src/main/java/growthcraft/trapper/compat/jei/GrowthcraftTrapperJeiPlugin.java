@@ -8,7 +8,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -18,7 +18,7 @@ import java.util.List;
 @JeiPlugin
 public class GrowthcraftTrapperJeiPlugin implements IModPlugin {
 
-    public static final ResourceLocation PLUGIN_UID = id("jei_plugin");
+    public static final Identifier PLUGIN_UID = id("jei_plugin");
     public static final RecipeType<TrapJeiRecipe> FISH_TRAPPING =
             new RecipeType<>(id("fish_trapping"), TrapJeiRecipe.class);
     public static final RecipeType<TrapJeiRecipe> ANIMAL_TRAPPING =
@@ -27,7 +27,7 @@ public class GrowthcraftTrapperJeiPlugin implements IModPlugin {
             new RecipeType<>(id("spawn_egg_trapping"), TrapJeiRecipe.class);
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return PLUGIN_UID;
     }
 
@@ -113,7 +113,7 @@ public class GrowthcraftTrapperJeiPlugin implements IModPlugin {
         return java.util.Arrays.stream(items).map(ItemStack::new).toList();
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(Reference.MODID, path);
     }
 }

@@ -43,7 +43,7 @@ public class FishtrapMenu extends AbstractContainerMenu {
         addPlayerHotbar(inventory);
 
         // Add our block's inventory slots.
-        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, fishtrapBlockEntity.getBlockPos(), null);
+        IItemHandler handler = fishtrapBlockEntity.getItemHandler(null);
         if (handler != null) {
             // 1 Input Slot
             this.addSlot(new SlotItemHandler(handler, 0, 17, 20));

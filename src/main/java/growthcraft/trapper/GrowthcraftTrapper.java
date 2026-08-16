@@ -32,8 +32,8 @@ public class GrowthcraftTrapper {
         modEventBus.addListener(this::setup);
         EVENT_BUS.addListener(this::onServerStarting);
         modEventBus.addListener(this::clientSetupEvent);
-        modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerScreens);
+        modEventBus.addListener(this::registerCapabilities);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, GrowthcraftTrapperConfig.SERVER,
                 GrowthcraftTrapperConfig.SERVER_CONFIG);
@@ -51,21 +51,12 @@ public class GrowthcraftTrapper {
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                GrowthcraftTrapperBlockEntities.ANIMAL_TRAP_BLOCK_ENTITY.get(),
-                (be, side) -> be.getItemHandler(side)
-        );
-        event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                GrowthcraftTrapperBlockEntities.FISHTRAP_BLOCK_ENTITY.get(),
-                (be, side) -> be.getItemHandler(side)
-        );
-        event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                GrowthcraftTrapperBlockEntities.SPAWNEGGTRAP_BLOCK_ENTITY.get(),
-                (be, side) -> be.getItemHandler(side)
-        );
+        event.registerBlockEntity(Capabilities.Item.BLOCK, GrowthcraftTrapperBlockEntities.FISHTRAP_BLOCK_ENTITY.get(),
+                (blockEntity, side) -> blockEntity.getResourceHandler(side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK, GrowthcraftTrapperBlockEntities.ANIMAL_TRAP_BLOCK_ENTITY.get(),
+                (blockEntity, side) -> blockEntity.getResourceHandler(side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK, GrowthcraftTrapperBlockEntities.SPAWNEGGTRAP_BLOCK_ENTITY.get(),
+                (blockEntity, side) -> blockEntity.getResourceHandler(side));
     }
 
     private void setup(final FMLCommonSetupEvent event) {

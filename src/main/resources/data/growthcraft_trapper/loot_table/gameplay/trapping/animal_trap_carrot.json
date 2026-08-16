@@ -26,9 +26,8 @@
           "name": "minecraft:rabbit_foot"
         },
         {
-          "type": "minecraft:item",
-          "weight": 50,
-          "name": "minecraft:air"
+          "type": "minecraft:empty",
+          "weight": 50
         }
       ]
     }

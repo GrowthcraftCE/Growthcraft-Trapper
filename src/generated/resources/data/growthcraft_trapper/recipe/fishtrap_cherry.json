@@ -3,15 +3,9 @@
   "category": "misc",
   "group": "fishtrap",
   "key": {
-    "A": {
-      "item": "minecraft:cherry_planks"
-    },
-    "B": {
-      "item": "minecraft:lead"
-    },
-    "C": {
-      "item": "minecraft:string"
-    }
+    "A": "minecraft:cherry_planks",
+    "B": "minecraft:lead",
+    "C": "minecraft:string"
   },
   "pattern": [
     "ACA",
@@ -19,7 +13,6 @@
     "ACA"
   ],
   "result": {
-    "count": 1,
     "id": "growthcraft_trapper:fishtrap_cherry"
   }
 }

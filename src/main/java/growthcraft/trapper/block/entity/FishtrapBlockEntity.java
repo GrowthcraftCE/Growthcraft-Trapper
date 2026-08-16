@@ -5,6 +5,9 @@ import growthcraft.trapper.init.GrowthcraftTrapperBlockEntities;
 import growthcraft.trapper.init.GrowthcraftTrapperTags;
 import growthcraft.trapper.init.config.GrowthcraftTrapperConfig;
 import growthcraft.trapper.lib.handler.WrappedInventoryHandler;
+import growthcraft.trapper.lib.handler.LegacyItemResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import growthcraft.trapper.lib.utils.BlockStateUtils;
 import growthcraft.trapper.lib.utils.TickUtils;
 import growthcraft.trapper.lib.utils.TrapBaitTypes;
@@ -17,6 +20,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -38,6 +42,8 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -121,6 +127,10 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
         return directionWrappedHandlerMap.get(side);
     }
 
+    public ResourceHandler<ItemResource> getResourceHandler(@Nullable Direction side) {
+        return new LegacyItemResourceHandler((net.neoforged.neoforge.items.IItemHandlerModifiable) getItemHandler(side));
+    }
+
     private Component customName;
 
     public FishtrapBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -135,7 +145,7 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
 
     @Override
     public void tick(Level level, BlockPos blockPos, BlockState blockState, FishtrapBlockEntity fishtrapBlockEntity) {
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
 
         tickTimer++;
         if (tickCooldown != 0 && tickTimer > tickCooldown && canDoFishing(level, blockPos)) {
@@ -235,25 +245,21 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-        super.loadAdditional(nbt, registries);
-        itemStackHandler.deserializeNBT(registries, nbt.getCompound("inventory"));
-        this.tickTimer = nbt.getInt("tickTimer");
-        this.tickCooldown = nbt.getInt("tickCooldown");
-        if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"), registries);
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        itemStackHandler.deserialize(input.childOrEmpty("inventory"));
+        this.tickTimer = input.getIntOr("tickTimer", 0);
+        this.tickCooldown = input.getIntOr("tickCooldown", 0);
+        this.customName = input.read("CustomName", ComponentSerialization.CODEC).orElse(null);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-        super.saveAdditional(nbt, registries);
-        nbt.put("inventory", itemStackHandler.serializeNBT(registries));
-        nbt.putInt("tickTimer", this.tickTimer);
-        nbt.putInt("tickCooldown", this.tickCooldown);
-        if (this.customName != null) {
-            nbt.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
-        }
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        itemStackHandler.serialize(output.child("inventory"));
+        output.putInt("tickTimer", this.tickTimer);
+        output.putInt("tickCooldown", this.tickCooldown);
+        output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
     }
 
     @Override

@@ -14,9 +14,6 @@ final class TrapConditionMessages {
                 ? "message.growthcraft_trapper.conditions.ideal"
                 : "message.growthcraft_trapper.conditions.not_ideal";
         ChatFormatting color = ideal ? ChatFormatting.GREEN : ChatFormatting.YELLOW;
-        player.displayClientMessage(
-                Component.translatable(resultKey, Component.translatable(subjectKey)).withStyle(color),
-                true
-        );
+        player.sendOverlayMessage(Component.translatable(resultKey, Component.translatable(subjectKey)).withStyle(color));
     }
 }

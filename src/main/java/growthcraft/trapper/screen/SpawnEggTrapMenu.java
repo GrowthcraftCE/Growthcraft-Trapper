@@ -44,7 +44,7 @@ public class SpawnEggTrapMenu extends AbstractContainerMenu {
         addPlayerHotbar(inventory);
 
         // Add our block's inventory slots.
-        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, spawnEggTrapBlockEntity.getBlockPos(), null);
+        IItemHandler handler = spawnEggTrapBlockEntity.getItemHandler(null);
         if (handler != null) {
             // 1 Input Slot
             this.addSlot(new SlotItemHandler(handler, 0, 17, 20));

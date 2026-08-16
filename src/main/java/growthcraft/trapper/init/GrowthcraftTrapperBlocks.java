@@ -4,15 +4,19 @@ import growthcraft.trapper.block.AnimalTrapBlock;
 import growthcraft.trapper.block.FishtrapBlock;
 import growthcraft.trapper.block.SpawnEggTrapBlock;
 import growthcraft.trapper.shared.Reference;
-import net.minecraft.resources.ResourceLocation;
+import growthcraft.trapper.utils.BlockPropertiesUtils;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class GrowthcraftTrapperBlocks {
 
@@ -20,83 +24,84 @@ public class GrowthcraftTrapperBlocks {
 
     public static final DeferredBlock<Block> ANIMAL_TRAP_COPPER = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_COPPER,
-            () -> new AnimalTrapBlock(1)
+            properties -> new AnimalTrapBlock(1, properties), animalProperties()
     );
     public static final DeferredBlock<Block> ANIMAL_TRAP_DIAMOND = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_DIAMOND,
-            () -> new AnimalTrapBlock(4)
+            properties -> new AnimalTrapBlock(4, properties), animalProperties()
     );
     public static final DeferredBlock<Block> ANIMAL_TRAP_GOLD = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_GOLD,
-            () -> new AnimalTrapBlock(3)
+            properties -> new AnimalTrapBlock(3, properties), animalProperties()
     );
     public static final DeferredBlock<Block> ANIMAL_TRAP_IRON = registerBlock(
             Reference.UnlocalizedName.ANIMAL_TRAP_IRON,
-            () -> new AnimalTrapBlock(2)
+            properties -> new AnimalTrapBlock(2, properties), animalProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_OAK = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_OAK,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_ACACIA = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_ACACIA,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_DARK_OAK = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_DARK_OAK,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_BIRCH = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_BIRCH,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_SPRUCE = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_SPRUCE,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_JUNGLE = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_JUNGLE,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_BAMBOO = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_BAMBOO,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_CHERRY = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_CHERRY,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_CRIMSON = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_CRIMSON,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_MANGROVE = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_MANGROVE,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> FISHTRAP_WARPED = registerBlock(
             Reference.UnlocalizedName.FISHTRAP_WARPED,
-            FishtrapBlock::new
+            FishtrapBlock::new, fishtrapProperties()
     );
 
     public static final DeferredBlock<Block> SPAWNEGGTRAP = registerBlock(
             Reference.UnlocalizedName.SPAWNEGGTRAP,
-            SpawnEggTrapBlock::new
+            SpawnEggTrapBlock::new, spawnEggProperties()
     );
 
-    private static DeferredBlock<Block> registerBlock(String name, Supplier<Block> block) {
-        DeferredBlock<Block> registryObject = BLOCKS.register(name, block);
+    private static DeferredBlock<Block> registerBlock(String name, Function<BlockBehaviour.Properties, Block> block,
+                                                       Supplier<BlockBehaviour.Properties> properties) {
+        DeferredBlock<Block> registryObject = BLOCKS.registerBlock(name, block, properties);
         if (!excludeBlockItemRegistry(registryObject.getId())) {
             registerBlockItem(name, registryObject);
         }
@@ -104,7 +109,19 @@ public class GrowthcraftTrapperBlocks {
     }
 
     private static void registerBlockItem(String unlocalizedName, DeferredBlock<Block> blockRegistryObject) {
-        GrowthcraftTrapperItems.ITEMS.register(unlocalizedName, () -> new BlockItem(blockRegistryObject.get(), getDefaultItemProperties()));
+        GrowthcraftTrapperItems.ITEMS.registerSimpleBlockItem(unlocalizedName, blockRegistryObject);
+    }
+
+    private static Supplier<BlockBehaviour.Properties> animalProperties() {
+        return () -> BlockPropertiesUtils.getInitProperties("animal_trap", Blocks.IRON_BLOCK);
+    }
+
+    private static Supplier<BlockBehaviour.Properties> fishtrapProperties() {
+        return () -> BlockPropertiesUtils.getInitProperties("fishtrap_wooden", Blocks.OAK_PLANKS);
+    }
+
+    private static Supplier<BlockBehaviour.Properties> spawnEggProperties() {
+        return () -> BlockPropertiesUtils.getInitProperties("spawneggtrap", Blocks.NETHERITE_BLOCK);
     }
 
     private static Item.Properties getDefaultItemProperties() {
@@ -112,7 +129,7 @@ public class GrowthcraftTrapperBlocks {
         return properties;
     }
 
-    public static boolean excludeBlockItemRegistry(ResourceLocation registryName) {
+    public static boolean excludeBlockItemRegistry(Identifier registryName) {
         ArrayList<String> excludeBlocks = new ArrayList<>();
         //excludeBlocks.add(Reference.MODID + ":" + Reference.UnlocalizedName.APPLE_TREE_FRUIT);
         return excludeBlocks.contains(registryName.toString());

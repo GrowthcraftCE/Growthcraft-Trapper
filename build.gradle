@@ -3,7 +3,7 @@ plugins {
     id 'jacoco'
     id 'org.sonarqube' version '7.2.3.7755'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.107'
+    id 'net.neoforged.moddev' version '2.0.141'
     id 'idea'
 }
 
@@ -25,8 +25,8 @@ sonar {
         property 'sonar.projectName', 'Growthcraft Trapper (NeoForge)'
         property 'sonar.projectVersion', project.version.toString()
         property 'sonar.host.url', 'https://sonarcloud.io'
-        property 'sonar.java.source', '21'
-        property 'sonar.java.target', '21'
+        property 'sonar.java.source', '25'
+        property 'sonar.java.target', '25'
         property 'sonar.coverage.jacoco.xmlReportPaths', layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile.path
         property 'sonar.exclusions', [
                 'src/generated/**',
@@ -43,6 +43,9 @@ base {
 
 repositories {
     mavenCentral()
+    maven {
+        url = 'https://maven.blamejared.com/'
+    }
     exclusiveContent {
         forRepository {
             maven {
@@ -56,26 +59,19 @@ repositories {
     }
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
     version = project.neo_version
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
-
     runs {
         client {
-            type = 'neoforgeclientdev'
             client()
             jvmArgument '-Xmx2G'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
-            type = 'neoforgeserverdev'
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -87,8 +83,7 @@ neoForge {
         }
 
         data {
-            type = 'neoforgedatadev'
-            data()
+            serverData()
             programArguments.addAll '--mod', project.mod_id, '--all',
                     '--output', file('src/generated/resources/').absolutePath,
                     '--existing', file('src/main/resources/').absolutePath
@@ -109,13 +104,9 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-configurations {
-    runtimeClasspath.extendsFrom localRuntime
-}
-
 dependencies {
-    compileOnly "maven.modrinth:jei:${jei_runtime_version}"
-    localRuntime "maven.modrinth:jei:${jei_runtime_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version_short}-neoforge:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${minecraft_version_short}-neoforge:${jei_version}"
 
     testImplementation platform('org.junit:junit-bom:5.14.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

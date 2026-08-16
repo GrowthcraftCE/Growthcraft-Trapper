@@ -58,7 +58,7 @@ public class AnimalTrapMenu extends AbstractContainerMenu {
         addPlayerHotbar(inventory);
 
         // Add our block's inventory slots.
-        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, trapBlockEntity.getBlockPos(), null);
+        IItemHandler handler = trapBlockEntity.getItemHandler(null);
         if (handler != null) {
             // 1 Input Slot
             this.addSlot(new SlotItemHandler(handler, 0, 17, 20));

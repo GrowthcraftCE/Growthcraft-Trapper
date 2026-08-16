@@ -3,15 +3,9 @@
   "category": "misc",
   "group": "animal_trap",
   "key": {
-    "A": {
-      "item": "minecraft:diamond"
-    },
-    "B": {
-      "item": "minecraft:bucket"
-    },
-    "C": {
-      "item": "minecraft:iron_bars"
-    }
+    "A": "minecraft:diamond",
+    "B": "minecraft:bucket",
+    "C": "minecraft:iron_bars"
   },
   "pattern": [
     "ACA",
@@ -19,7 +13,6 @@
     "ACA"
   ],
   "result": {
-    "count": 1,
     "id": "growthcraft_trapper:animal_trap_diamond"
   }
 }

@@ -1,12 +1,11 @@
 package growthcraft.trapper.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import growthcraft.trapper.shared.Reference;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class FishtrapScreen extends AbstractContainerScreen<FishtrapMenu> {
@@ -15,7 +14,7 @@ public class FishtrapScreen extends AbstractContainerScreen<FishtrapMenu> {
     private static final int FILTER_ICON_Y = 24;
     private static final int FILTER_ICON_SIZE = 9;
 
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID,
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Reference.MODID,
             "textures/gui/fishtrap_screen.png");
 
     public FishtrapScreen(FishtrapMenu menu, Inventory inventory, Component component) {
@@ -23,32 +22,29 @@ public class FishtrapScreen extends AbstractContainerScreen<FishtrapMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics poseStack, float partialTick, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TEXTURE);
-
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
-
-        poseStack.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0, 0,
+                imageWidth, imageHeight, 256, 256);
     }
 
     @Override
-    public void render(GuiGraphics poseStack, int mouseX, int mouseY, float delta) {
-        renderBackground(poseStack, mouseX, mouseY, delta);
-        super.render(poseStack, mouseX, mouseY, delta);
-        renderTooltip(poseStack, mouseX, mouseY);
+    protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (isHovering(FILTER_ICON_X, FILTER_ICON_Y, FILTER_ICON_SIZE, FILTER_ICON_SIZE, mouseX, mouseY)) {
-            poseStack.renderTooltip(font, TrapLootTooltips.fish(menu.getBaitStack()), java.util.Optional.empty(), mouseX, mouseY);
+            graphics.setTooltipForNextFrame(font, TrapLootTooltips.fish(menu.getBaitStack()),
+                    java.util.Optional.empty(), mouseX, mouseY);
+            return;
         }
+        super.extractTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int p_97809_, int p_97810_) {
-        guiGraphics.drawString(this.font, this.title,
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.text(this.font, this.title,
                 this.titleLabelX, this.titleLabelY, 4210752, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle,
+        guiGraphics.text(this.font, this.playerInventoryTitle,
                 this.inventoryLabelX, this.inventoryLabelY - 32, 4210752, false);
     }
 }

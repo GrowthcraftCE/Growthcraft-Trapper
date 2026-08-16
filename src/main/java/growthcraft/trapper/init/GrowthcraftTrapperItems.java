@@ -1,7 +1,7 @@
 package growthcraft.trapper.init;
 
 import growthcraft.trapper.shared.Reference;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -15,7 +15,7 @@ public class GrowthcraftTrapperItems {
 
     }
 
-    public static boolean excludeItemRegistry(ResourceLocation registryName) {
+    public static boolean excludeItemRegistry(Identifier registryName) {
         ArrayList<String> excludeBlocks = new ArrayList<>();
         //excludeBlocks.add(Reference.MODID + ":" + Reference.UnlocalizedName.APPLE_TREE_FRUIT);
         return excludeBlocks.contains(registryName.toString());

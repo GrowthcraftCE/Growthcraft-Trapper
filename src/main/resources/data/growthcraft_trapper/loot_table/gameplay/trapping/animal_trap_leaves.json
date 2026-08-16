@@ -91,9 +91,8 @@
           "name": "minecraft:red_wool"
         },
         {
-          "type": "minecraft:item",
-          "weight": 25,
-          "name": "minecraft:air"
+          "type": "minecraft:empty",
+          "weight": 25
         }
       ]
     }

@@ -15,10 +15,10 @@ public final class GrowthcraftTrapperDataGenerators {
     }
 
     @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
+    public static void gatherData(GatherDataEvent.Server event) {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
-        generator.addProvider(event.includeServer(),
-                new GrowthcraftTrapperRecipeProvider(output, event.getLookupProvider()));
+        event.addProvider(new GrowthcraftTrapperRecipeProvider.Runner(output, event.getLookupProvider()));
+        event.addProvider(new TrapperItemDefinitions(output));
     }
 }

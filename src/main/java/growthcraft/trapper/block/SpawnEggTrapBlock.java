@@ -7,12 +7,13 @@ import growthcraft.trapper.init.GrowthcraftTrapperBlockEntities;
 import growthcraft.trapper.utils.BlockPropertiesUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SpawnEggTrapBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
 
-    public static final DirectionProperty FACING = DirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final MapCodec<SpawnEggTrapBlock> CODEC = simpleCodec(SpawnEggTrapBlock::new);
 
@@ -54,18 +55,18 @@ public class SpawnEggTrapBlock extends BaseEntityBlock implements SimpleWaterlog
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
         if (!(blockEntity instanceof SpawnEggTrapBlockEntity spawnEggTrapBlockEntity))
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        if (level.isClientSide)
-            return ItemInteractionResult.SUCCESS;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
 
         if (player.isShiftKeyDown()) {
             TrapConditionMessages.show(player, "message.growthcraft_trapper.conditions.subject.spawn_egg", spawnEggTrapBlockEntity.hasIdealConditions());
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
 
         try {
@@ -80,7 +81,7 @@ public class SpawnEggTrapBlock extends BaseEntityBlock implements SimpleWaterlog
             GrowthcraftTrapper.LOGGER.error(ex.getMessage());
         }
 
-        return ItemInteractionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
 
     @Override
@@ -90,7 +91,7 @@ public class SpawnEggTrapBlock extends BaseEntityBlock implements SimpleWaterlog
         if (!(blockEntity instanceof SpawnEggTrapBlockEntity spawnEggTrapBlockEntity))
             return InteractionResult.PASS;
 
-        if (level.isClientSide)
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
         if (player.isShiftKeyDown()) {
@@ -175,15 +176,13 @@ public class SpawnEggTrapBlock extends BaseEntityBlock implements SimpleWaterlog
     }
 
     @Override
-    public void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState newBlockState, boolean isMoving) {
-        if (blockState.getBlock() != newBlockState.getBlock()) {
-            try {
-                SpawnEggTrapBlockEntity blockEntity = (SpawnEggTrapBlockEntity) level.getBlockEntity(blockPos);
-                blockEntity.dropItems();
-            } catch (Exception ex) {
-                GrowthcraftTrapper.LOGGER.error(String.format("Invalid blockEntity type at %s, expected SpawnEggTrapBlockEntity", blockPos));
-            }
+    protected void affectNeighborsAfterRemoval(BlockState blockState, ServerLevel level, BlockPos blockPos, boolean isMoving) {
+        try {
+            SpawnEggTrapBlockEntity blockEntity = (SpawnEggTrapBlockEntity) level.getBlockEntity(blockPos);
+            blockEntity.dropItems();
+        } catch (Exception ex) {
+            GrowthcraftTrapper.LOGGER.error(String.format("Invalid blockEntity type at %s, expected SpawnEggTrapBlockEntity", blockPos));
         }
-        super.onRemove(blockState, level, blockPos, newBlockState, isMoving);
+        super.affectNeighborsAfterRemoval(blockState, level, blockPos, isMoving);
     }
 }
