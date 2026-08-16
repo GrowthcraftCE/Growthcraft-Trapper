@@ -2,9 +2,9 @@
 
 # Growthcraft Trapper
 
-[![Version](https://img.shields.io/badge/version-1.21.1.1-orange.svg)](https://github.com/GrowthcraftCE/Growthcraft-Trapper)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-62b47a.svg)](https://www.minecraft.net/)
-[![NeoForge](https://img.shields.io/badge/NeoForge-21.1.x-yellow.svg)](https://neoforged.net/)
+[![Version](https://img.shields.io/badge/version-26.1.2.1-orange.svg)](https://github.com/GrowthcraftCE/Growthcraft-Trapper/releases/tag/26.1.2.1)
+[![Minecraft](https://img.shields.io/badge/Minecraft-26.1.2-62b47a.svg)](https://www.minecraft.net/)
+[![NeoForge](https://img.shields.io/badge/NeoForge-26.1.x-yellow.svg)](https://neoforged.net/)
 [![CurseForge](https://cf.way2muchnoise.eu/short_growthcraft-trapper.svg)](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper)
 [![Discord](https://img.shields.io/discord/333690296334548994.svg?label=Discord&color=5865f2)](https://discord.gg/Quh76Jn)
 
@@ -64,7 +64,8 @@ When reporting a problem, include the Minecraft, NeoForge, and Growthcraft Trapp
 
 | Minecraft | Loader | Latest Trapper version | Status |
 | --- | --- | --- | --- |
-| 1.21.1 | NeoForge | 1.21.1.1 | In development |
+| 26.1.2 | NeoForge | 26.1.2.1 | Released |
+| 1.21.1 | NeoForge | 1.21.1.1 | Released |
 | 1.20.6 | NeoForge | 1.20.6.1 | Released |
 | 1.20.4 | NeoForge | 1.20.4.1-neo | Released |
 | 1.20.4 | Forge | 1.20.4.1 | Released |
@@ -80,9 +81,9 @@ appropriate Minecraft version branch.
 
 Requirements:
 
-- Java 21
+- Java 25
 - The included Gradle Wrapper
-- A Minecraft 1.21.1-compatible IDE
+- A Minecraft 26.1.2-compatible IDE
 
 Useful commands:
 
