@@ -63,6 +63,11 @@ public class FishtrapBlock extends BaseEntityBlock implements SimpleWaterloggedB
         if (level.isClientSide)
             return ItemInteractionResult.SUCCESS;
 
+        if (player.isShiftKeyDown()) {
+            TrapConditionMessages.show(player, "message.growthcraft_trapper.conditions.subject.fishing", fishtrapBlockEntity.hasIdealConditions());
+            return ItemInteractionResult.CONSUME;
+        }
+
         try {
             // Play sound
             level.playSound(player, blockPos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -87,6 +92,11 @@ public class FishtrapBlock extends BaseEntityBlock implements SimpleWaterloggedB
 
         if (level.isClientSide)
             return InteractionResult.SUCCESS;
+
+        if (player.isShiftKeyDown()) {
+            TrapConditionMessages.show(player, "message.growthcraft_trapper.conditions.subject.fishing", fishtrapBlockEntity.hasIdealConditions());
+            return InteractionResult.CONSUME;
+        }
 
         try {
             // Play sound

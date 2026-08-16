@@ -7,15 +7,14 @@ import growthcraft.trapper.init.config.GrowthcraftTrapperConfig;
 import growthcraft.trapper.lib.handler.WrappedInventoryHandler;
 import growthcraft.trapper.lib.utils.BlockStateUtils;
 import growthcraft.trapper.lib.utils.TickUtils;
+import growthcraft.trapper.lib.utils.TrapBaitTypes;
+import growthcraft.trapper.lib.utils.TrapEnvironmentRules;
 import growthcraft.trapper.screen.AnimalTrapMenu;
 import growthcraft.trapper.shared.Reference;
-import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -23,7 +22,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -43,22 +41,18 @@ import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTicker<AnimalTrapBlockEntity>, MenuProvider {
 
-    private final int minTick = TickUtils.toTicks(GrowthcraftTrapperConfig.getMinTickFishingInMinutes(), "minutes");
-    private final int maxTick = TickUtils.toTicks(GrowthcraftTrapperConfig.getMaxTickFishingInMinutes(), "minutes");
+    private final int minTick = TickUtils.toTicks(GrowthcraftTrapperConfig.getMinTickAnimalTrappingInMinutes(), "minutes");
+    private final int maxTick = TickUtils.toTicks(GrowthcraftTrapperConfig.getMaxTickAnimalTrappingInMinutes(), "minutes");
     private int tickTimer = 0;
     private int tickCooldown = 0;
 
@@ -138,33 +132,51 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
     public void tick(Level level, BlockPos blockPos, BlockState blockState, AnimalTrapBlockEntity blockEntity) {
         if (level.isClientSide) return;
 
-        if (GrowthcraftTrapperConfig.isDebugEnabled() && (tickTimer % 100 == 0)) {
-            GrowthcraftTrapper.LOGGER.debug(String.format("AnimalTrapBlockEntity [%s] - tickTimer - %d/%d ", blockPos.toShortString(), tickTimer, tickCooldown));
-        }
-
         tickTimer++;
 
         if (tickCooldown != 0 && tickTimer > tickCooldown && canDoTrapping(level, blockPos)) {
             this.doTrapping(blockPos);
             tickTimer = 0;
-            tickCooldown = TickUtils.getRandomTickCooldown(minTick, maxTick) / ((AnimalTrapBlock) level.getBlockState(blockPos).getBlock()).getProcessingFactor();
+            tickCooldown = TickUtils.applyProcessingFactor(
+                    TickUtils.getRandomTickCooldown(minTick, maxTick),
+                    ((AnimalTrapBlock) level.getBlockState(blockPos).getBlock()).getProcessingFactor()
+            );
         } else if(tickCooldown == 0 && canDoTrapping(level,blockPos)) {
-            tickCooldown = TickUtils.getRandomTickCooldown(minTick, maxTick) / ((AnimalTrapBlock) level.getBlockState(blockPos).getBlock()).getProcessingFactor();
+            tickCooldown = TickUtils.applyProcessingFactor(
+                    TickUtils.getRandomTickCooldown(minTick, maxTick),
+                    ((AnimalTrapBlock) level.getBlockState(blockPos).getBlock()).getProcessingFactor()
+            );
         }
     }
 
     private boolean canDoTrapping(Level level, BlockPos blockPos) {
         Map<String, Block> blockMap = BlockStateUtils.getSurroundingBlocks(level, blockPos);
 
-        if (blockMap.get("up") != Blocks.AIR) return false;
+        return TrapEnvironmentRules.isAnimalTrapIdeal(
+                blockMap.get("up") == Blocks.AIR,
+                isValidHorizontalBlock(blockMap.get("north")),
+                isValidHorizontalBlock(blockMap.get("east")),
+                isValidHorizontalBlock(blockMap.get("south")),
+                isValidHorizontalBlock(blockMap.get("west"))
+        );
+    }
 
-        List<Block> horizontalBlocks = Arrays.asList(blockMap.get("north"), blockMap.get("north"), blockMap.get("north"), blockMap.get("north"));
+    private static boolean isValidHorizontalBlock(Block block) {
+        return block != Blocks.AIR && !(block instanceof LiquidBlock);
+    }
 
-        for (Block block : horizontalBlocks) {
-            if (block == Blocks.AIR || block instanceof LiquidBlock) return false;
-        }
+    public boolean hasIdealConditions() {
+        return level != null && canDoTrapping(level, worldPosition);
+    }
 
-        return true;
+    public String getConditionSubjectKey() {
+        return switch (TrapBaitTypes.animal(itemStackHandler.getStackInSlot(0))) {
+            case WHEAT -> "message.growthcraft_trapper.conditions.subject.cattle";
+            case CARROT -> "message.growthcraft_trapper.conditions.subject.pig_rabbit";
+            case SEEDS -> "message.growthcraft_trapper.conditions.subject.chicken";
+            case LEAVES -> "message.growthcraft_trapper.conditions.subject.sheep";
+            case INVALID -> "message.growthcraft_trapper.conditions.subject.invalid_bait";
+        };
     }
 
     private void doTrapping(@NotNull BlockPos blockPos) {
@@ -177,16 +189,16 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
         String lootTableType = "";
 
         // Depending on the bait that was used, determines what gets caught.
-        if (baitItemStack.is(Tags.Items.CROPS_WHEAT)) {
+        if (TrapBaitTypes.animal(baitItemStack) == TrapBaitTypes.Animal.WHEAT) {
             lootTableType = "wheat";
             lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_WHEAT);
-        } else if (baitItemStack.is(Tags.Items.CROPS_CARROT)) {
+        } else if (TrapBaitTypes.animal(baitItemStack) == TrapBaitTypes.Animal.CARROT) {
             lootTableType = "carrot";
             lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_CARROT);
-        } else if (baitItemStack.is(Tags.Items.SEEDS_WHEAT)) {
+        } else if (TrapBaitTypes.animal(baitItemStack) == TrapBaitTypes.Animal.SEEDS) {
             lootTableType = "seeds_wheat";
             lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_SEEDS);
-        } else if (baitItemStack.is(ItemTags.LEAVES)) {
+        } else if (TrapBaitTypes.animal(baitItemStack) == TrapBaitTypes.Animal.LEAVES) {
             lootTableType = "leaves";
             lootTable = level.getServer().reloadableRegistries().getLootTable(Reference.LootTables.ANIMAL_TRAP_LEAVES);
         } else {
@@ -194,9 +206,12 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
             lootTable = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.EMPTY);
         }
 
-        GrowthcraftTrapper.LOGGER.debug(
-                String.format("AnimalTrapBlockEntity [%s] - doTrapping - Bait [%s], LootTableType [%s].", blockPos.toShortString(), baitItemStack, lootTable)
-        );
+        if (GrowthcraftTrapperConfig.isDebugEnabled()) {
+            GrowthcraftTrapper.LOGGER.debug(
+                    "Animal trap at {} used bait {} with loot table {}.",
+                    blockPos.toShortString(), baitItemStack, lootTableType
+            );
+        }
 
         // If loot table is null, fail now.
         if (lootTable == null) return;
@@ -208,9 +223,10 @@ public class AnimalTrapBlockEntity extends BlockEntity implements BlockEntityTic
         List<ItemStack> lootItemStacks = lootTable.getRandomItems(lootContext);
 
         for (ItemStack itemStack : lootItemStacks) {
-            if (GrowthcraftTrapperConfig.isDebugEnabled() && ( (tickTimer % 100 == 0) || tickTimer >= tickCooldown ) ) {
+            if (GrowthcraftTrapperConfig.isDebugEnabled()) {
                 GrowthcraftTrapper.LOGGER.debug(
-                        String.format("AnimalTrapBlockEntity [%s] - doTrapping - Caught a %s from %s loot table.", blockPos.toShortString(), itemStack, lootTableType)
+                        "Animal trap at {} caught {} from the {} loot table.",
+                        blockPos.toShortString(), itemStack, lootTableType
                 );
             }
 

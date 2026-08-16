@@ -1,13 +1,14 @@
 package growthcraft.trapper.block.entity;
 
 import com.mojang.authlib.GameProfile;
-import growthcraft.trapper.GrowthcraftTrapper;
 import growthcraft.trapper.init.GrowthcraftTrapperBlockEntities;
 import growthcraft.trapper.init.GrowthcraftTrapperTags;
 import growthcraft.trapper.init.config.GrowthcraftTrapperConfig;
 import growthcraft.trapper.lib.handler.WrappedInventoryHandler;
 import growthcraft.trapper.lib.utils.BlockStateUtils;
 import growthcraft.trapper.lib.utils.TickUtils;
+import growthcraft.trapper.lib.utils.TrapBaitTypes;
+import growthcraft.trapper.lib.utils.TrapEnvironmentRules;
 import growthcraft.trapper.screen.FishtrapMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,8 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -32,7 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -139,10 +137,6 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
     public void tick(Level level, BlockPos blockPos, BlockState blockState, FishtrapBlockEntity fishtrapBlockEntity) {
         if (level.isClientSide) return;
 
-        if (GrowthcraftTrapperConfig.isDebugEnabled() && (tickTimer % 100 == 0)) {
-            GrowthcraftTrapper.LOGGER.debug(String.format("FishtrapBlockEntity [%s] - tickTimer - %d/%d ", blockPos.toShortString(), tickTimer, tickCooldown));
-        }
-
         tickTimer++;
         if (tickCooldown != 0 && tickTimer > tickCooldown && canDoFishing(level, blockPos)) {
             this.doFishing(blockPos);
@@ -163,28 +157,19 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
     @ParametersAreNonnullByDefault
     private boolean canDoFishing(Level level, BlockPos pos) {
         Map<String, Block> blockMap = BlockStateUtils.getSurroundingBlocks(level, pos);
+        return TrapEnvironmentRules.isFishtrapIdeal(
+                blockMap.get("up") instanceof LiquidBlock,
+                blockMap.get("down") instanceof LiquidBlock,
+                blockMap.get("north") instanceof LiquidBlock,
+                blockMap.get("east") instanceof LiquidBlock,
+                blockMap.get("south") instanceof LiquidBlock,
+                blockMap.get("west") instanceof LiquidBlock,
+                this.getBlockState().getValue(BlockStateProperties.WATERLOGGED)
+        );
+    }
 
-        // Scenario 1 - BlockUp and BlockDown are water.
-        if (blockMap.get("down") instanceof LiquidBlock
-                && blockMap.get("up") instanceof LiquidBlock) {
-            return true;
-        }
-
-        // Scenario 2 - BlockNorth, BlockEast, BlockSouth, and BlockWest are water.
-        if (blockMap.get("north") instanceof LiquidBlock
-                && blockMap.get("east") instanceof LiquidBlock
-                && blockMap.get("south") instanceof LiquidBlock
-                && blockMap.get("west") instanceof LiquidBlock) {
-            return true;
-        }
-
-        // Scenario 3 - Horizontal blocks are Water and Block is WATERLOGGED.
-        boolean eastWest = blockMap.get("east") instanceof LiquidBlock
-                && blockMap.get("west") instanceof LiquidBlock;
-        boolean northSouth = blockMap.get("north") instanceof LiquidBlock
-                && blockMap.get("south") instanceof LiquidBlock;
-
-        return (eastWest || northSouth) && this.getBlockState().getValue(BlockStateProperties.WATERLOGGED).equals(Boolean.TRUE);
+    public boolean hasIdealConditions() {
+        return level != null && canDoFishing(level, worldPosition);
     }
 
     private void doFishing(BlockPos blockPos) {
@@ -201,12 +186,13 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
         // Virtual Fishing Rod for calculating the loot tables.
         ItemStack fishingRod = new ItemStack(Items.FISHING_ROD);
 
-        if (baitItemStack.is(GrowthcraftTrapperTags.Items.FISHTRAP_BAIT_FORTUNE)) {
+        if (TrapBaitTypes.fish(baitItemStack) == TrapBaitTypes.Fish.FORTUNE) {
             luck = 3;
-            fishingRod.enchant(serverLevel.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, new ResourceLocation("minecraft", "luck_of_the_sea"))).value(), luck);
+            fishingRod.enchant(serverLevel.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+                    .getOrThrow(Enchantments.LUCK_OF_THE_SEA), luck);
             // Fish from the Treasure Loot Table
             lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING_TREASURE);
-        } else if (baitItemStack.is(GrowthcraftTrapperTags.Items.FISHTRAP_BAIT)) {
+        } else if (TrapBaitTypes.fish(baitItemStack) == TrapBaitTypes.Fish.NORMAL) {
             // Fish from the Standard Loot Table
             lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING);
         } else {
@@ -221,7 +207,7 @@ public class FishtrapBlockEntity extends BlockEntity implements BlockEntityTicke
                 .withLuck(luck)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockPos))
                 .withParameter(LootContextParams.TOOL, fishingRod)
-                .withParameter(LootContextParams.KILLER_ENTITY, fakePlayer)
+                .withParameter(LootContextParams.ATTACKING_ENTITY, fakePlayer)
                 .create(LootContextParamSets.FISHING);
 
         List<ItemStack> lootItemStacks = lootTable.getRandomItems(lootContext);

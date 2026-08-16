@@ -50,14 +50,14 @@ public class Reference {
 
     public static class LootTables {
 
-        public static final ResourceKey<LootTable> ANIMAL_TRAP_CARROT = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/animal_trap_carrot"));
-        public static final ResourceKey<LootTable> ANIMAL_TRAP_LEAVES = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/animal_trap_leaves"));
-        public static final ResourceKey<LootTable> ANIMAL_TRAP_SEEDS = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/animal_trap_seeds"));
-        public static final ResourceKey<LootTable> ANIMAL_TRAP_WHEAT = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/animal_trap_wheat"));
-        public static final ResourceKey<LootTable> FISHTRAP_BAIT = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/fishtrap_bait"));
-        public static final ResourceKey<LootTable> FISHTRAP_BAIT_FORTUNE = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/fishtrap_bait_fortune"));
-        public static final ResourceKey<LootTable> FISHTRAP_BAIT_JUNK = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/fishtrap_bait_junk"));
-        public static final ResourceKey<LootTable> SPAWNEGGTRAP_WHEAT = ResourceKey.create(Registries.LOOT_TABLE, new ResourceLocation(Reference.MODID, "gameplay/trapping/spawneggtrap_wheat"));
+        public static final ResourceKey<LootTable> ANIMAL_TRAP_CARROT = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/animal_trap_carrot"));
+        public static final ResourceKey<LootTable> ANIMAL_TRAP_LEAVES = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/animal_trap_leaves"));
+        public static final ResourceKey<LootTable> ANIMAL_TRAP_SEEDS = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/animal_trap_seeds"));
+        public static final ResourceKey<LootTable> ANIMAL_TRAP_WHEAT = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/animal_trap_wheat"));
+        public static final ResourceKey<LootTable> FISHTRAP_BAIT = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/fishtrap_bait"));
+        public static final ResourceKey<LootTable> FISHTRAP_BAIT_FORTUNE = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/fishtrap_bait_fortune"));
+        public static final ResourceKey<LootTable> FISHTRAP_BAIT_JUNK = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/fishtrap_bait_junk"));
+        public static final ResourceKey<LootTable> SPAWNEGGTRAP_WHEAT = ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "gameplay/trapping/spawneggtrap_wheat"));
     }
 
 }

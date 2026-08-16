@@ -6,13 +6,14 @@ import growthcraft.trapper.init.config.GrowthcraftTrapperConfig;
 import growthcraft.trapper.lib.handler.WrappedInventoryHandler;
 import growthcraft.trapper.lib.utils.BlockStateUtils;
 import growthcraft.trapper.lib.utils.TickUtils;
+import growthcraft.trapper.lib.utils.TrapBaitTypes;
+import growthcraft.trapper.lib.utils.TrapEnvironmentRules;
 import growthcraft.trapper.screen.SpawnEggTrapMenu;
 import growthcraft.trapper.shared.Reference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -39,16 +40,13 @@ import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityTicker<SpawnEggTrapBlockEntity>, MenuProvider {
 
@@ -127,10 +125,6 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
     public void tick(Level level, BlockPos blockPos, BlockState blockState, SpawnEggTrapBlockEntity blockEntity) {
         if (level.isClientSide) return;
 
-        if (GrowthcraftTrapperConfig.isDebugEnabled() && (tickTimer % 100 == 0)) {
-            GrowthcraftTrapper.LOGGER.debug(String.format("SpawnEggTrapBlockEntity [%s] - tickTimer - %d/%d ", blockPos.toShortString(), tickTimer, tickCooldown));
-        }
-
         tickTimer++;
         if (tickCooldown != 0 && tickTimer > tickCooldown && canDoTrapping(level, blockPos)) {
             this.doTrapping(blockPos);
@@ -146,15 +140,21 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
         // and the above be air.
         Map<String, Block> blockMap = BlockStateUtils.getSurroundingBlocks(level, blockPos);
 
-        if (blockMap.get("up") != Blocks.AIR) return false;
+        return TrapEnvironmentRules.isAnimalTrapIdeal(
+                blockMap.get("up") == Blocks.AIR,
+                isValidHorizontalBlock(blockMap.get("north")),
+                isValidHorizontalBlock(blockMap.get("east")),
+                isValidHorizontalBlock(blockMap.get("south")),
+                isValidHorizontalBlock(blockMap.get("west"))
+        );
+    }
 
-        List<Block> horizontalBlocks = Arrays.asList(blockMap.get("north"), blockMap.get("north"), blockMap.get("north"), blockMap.get("north"));
+    private static boolean isValidHorizontalBlock(Block block) {
+        return block != Blocks.AIR && !(block instanceof LiquidBlock);
+    }
 
-        for (Block block : horizontalBlocks) {
-            if (block == Blocks.AIR || block instanceof LiquidBlock) return false;
-        }
-
-        return true;
+    public boolean hasIdealConditions() {
+        return level != null && canDoTrapping(level, worldPosition);
     }
 
     private void doTrapping(@NotNull BlockPos blockPos) {
@@ -168,7 +168,7 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
         String lootTableType = "";
 
         // Depending on the bait that was used, determines what gets caught.
-        if (baitItemStack.getItem() == Items.WHEAT) {
+        if (TrapBaitTypes.spawnEgg(baitItemStack) == TrapBaitTypes.SpawnEgg.WHEAT) {
             lootTableType = "wheat";
         }
 
@@ -192,9 +192,10 @@ public class SpawnEggTrapBlockEntity extends BlockEntity implements BlockEntityT
         List<ItemStack> lootItemStacks = lootTable.getRandomItems(lootContext);
 
         for (ItemStack itemStack : lootItemStacks) {
-            if (GrowthcraftTrapperConfig.isDebugEnabled() && (tickTimer % 100 == 0)) {
+            if (GrowthcraftTrapperConfig.isDebugEnabled()) {
                 GrowthcraftTrapper.LOGGER.debug(
-                        String.format("SpawnEggTrapBlockEntity [%s] - doTrapping - Caught a %s from %s loot table.", blockPos.toShortString(), itemStack, lootTableType)
+                        "Spawn-egg trap at {} caught {} from the {} loot table.",
+                        blockPos.toShortString(), itemStack, lootTableType
                 );
             }
 

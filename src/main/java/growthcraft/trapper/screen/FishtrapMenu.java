@@ -19,6 +19,8 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class FishtrapMenu extends AbstractContainerMenu {
 
+    private static final int BAIT_SLOT_INDEX = 36;
+
     private final FishtrapBlockEntity fishtrapBlockEntity;
     private final FishtrapBlock fishtrapBlock;
 
@@ -89,7 +91,6 @@ public class FishtrapMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else {
-            System.out.println("Invalid slotIndex:" + index);
             return ItemStack.EMPTY;
         }
         // If stack size == 0 (the entire stack was moved) set slot contents to null
@@ -112,6 +113,10 @@ public class FishtrapMenu extends AbstractContainerMenu {
                 player,
                 this.fishtrapBlock
         );
+    }
+
+    public ItemStack getBaitStack() {
+        return getSlot(BAIT_SLOT_INDEX).getItem();
     }
 
     private void addPlayerInventory(Inventory playerInventory) {

@@ -1,27 +1,43 @@
-# eclipse
-bin
+# Eclipse
+/bin/
 *.launch
-.settings
-.metadata
+/.settings/
+/.metadata/
 .classpath
 .project
 
-# idea
-out
+# IntelliJ IDEA
+/out/
 *.ipr
 *.iws
 *.iml
-.idea
+/.idea/
 
-# gradle
-build
-.gradle
+# Gradle
+/build/
+/.gradle/
 
-# other
-eclipse
-run
+# Development run directories
+/eclipse/
+/run/
+/runs/
+/run-data/
 
 # Files from Forge MDK
 forge*changelog.txt
-.local
+/.local/
+
+# Local AI-assistant state
 .aider*
+
+# Generated-data cache
+/src/generated/resources/.cache/
+
+# Local decompiled Minecraft/NeoForge references for porting
+/.decompiled/
+
+# Local internal porting documentation
+/docs/
+
+# Local coding-agent instructions
+/AGENTS.md

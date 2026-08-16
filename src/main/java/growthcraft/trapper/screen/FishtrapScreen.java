@@ -11,7 +11,11 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class FishtrapScreen extends AbstractContainerScreen<FishtrapMenu> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MODID,
+    private static final int FILTER_ICON_X = 7;
+    private static final int FILTER_ICON_Y = 24;
+    private static final int FILTER_ICON_SIZE = 9;
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID,
             "textures/gui/fishtrap_screen.png");
 
     public FishtrapScreen(FishtrapMenu menu, Inventory inventory, Component component) {
@@ -35,6 +39,9 @@ public class FishtrapScreen extends AbstractContainerScreen<FishtrapMenu> {
         renderBackground(poseStack, mouseX, mouseY, delta);
         super.render(poseStack, mouseX, mouseY, delta);
         renderTooltip(poseStack, mouseX, mouseY);
+        if (isHovering(FILTER_ICON_X, FILTER_ICON_Y, FILTER_ICON_SIZE, FILTER_ICON_SIZE, mouseX, mouseY)) {
+            poseStack.renderTooltip(font, TrapLootTooltips.fish(menu.getBaitStack()), java.util.Optional.empty(), mouseX, mouseY);
+        }
     }
 
     @Override

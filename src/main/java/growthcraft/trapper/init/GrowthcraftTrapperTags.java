@@ -14,7 +14,7 @@ public class GrowthcraftTrapperTags {
         public static final TagKey<Item> FISHTRAP_BAIT_FORTUNE = getTag("fishtrap_bait_fortune");
 
         private static TagKey<Item> getTag(String name) {
-            return ItemTags.create(new ResourceLocation(Reference.MODID, name));
+            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(Reference.MODID, name));
         }
 
     }

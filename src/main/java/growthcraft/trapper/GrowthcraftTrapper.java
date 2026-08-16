@@ -10,6 +10,8 @@ import growthcraft.trapper.shared.Reference;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -26,14 +28,15 @@ import static net.neoforged.neoforge.common.NeoForge.EVENT_BUS;
 public class GrowthcraftTrapper {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MODID);
 
-    public GrowthcraftTrapper(IEventBus modEventBus) {
+    public GrowthcraftTrapper(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::setup);
         EVENT_BUS.addListener(this::onServerStarting);
         modEventBus.addListener(this::clientSetupEvent);
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerScreens);
 
-        GrowthcraftTrapperConfig.loadConfig();
+        modContainer.registerConfig(ModConfig.Type.SERVER, GrowthcraftTrapperConfig.SERVER,
+                GrowthcraftTrapperConfig.SERVER_CONFIG);
 
         GrowthcraftTrapperBlocks.BLOCKS.register(modEventBus);
         GrowthcraftTrapperItems.ITEMS.register(modEventBus);

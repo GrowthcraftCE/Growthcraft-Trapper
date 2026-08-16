@@ -1,6 +1,6 @@
 package growthcraft.trapper.lib.utils;
 
-import java.security.SecureRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TickUtils {
 
@@ -54,6 +54,19 @@ public class TickUtils {
     }
 
     public static int getRandomTickCooldown(int min, int max) {
-        return new SecureRandom().nextInt(max - min) + min;
+        if (max < min) {
+            throw new IllegalArgumentException("Maximum cooldown must not be less than minimum cooldown");
+        }
+        if (max == min) {
+            return min;
+        }
+        return ThreadLocalRandom.current().nextInt(min, max);
+    }
+
+    public static int applyProcessingFactor(int cooldown, int processingFactor) {
+        if (processingFactor <= 0) {
+            throw new IllegalArgumentException("Processing factor must be positive");
+        }
+        return cooldown / processingFactor;
     }
 }

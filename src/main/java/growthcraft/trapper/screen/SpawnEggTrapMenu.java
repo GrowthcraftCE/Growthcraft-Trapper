@@ -19,6 +19,8 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class SpawnEggTrapMenu extends AbstractContainerMenu {
 
+    private static final int BAIT_SLOT_INDEX = 36;
+
     private final SpawnEggTrapBlockEntity spawnEggTrapBlockEntity;
     private final SpawnEggTrapBlock spawnEggTrapBlock;
 
@@ -90,7 +92,6 @@ public class SpawnEggTrapMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else {
-            System.out.println("Invalid slotIndex:" + index);
             return ItemStack.EMPTY;
         }
         // If stack size == 0 (the entire stack was moved) set slot contents to null
@@ -113,6 +114,10 @@ public class SpawnEggTrapMenu extends AbstractContainerMenu {
                 player,
                 this.spawnEggTrapBlock
         );
+    }
+
+    public ItemStack getBaitStack() {
+        return getSlot(BAIT_SLOT_INDEX).getItem();
     }
 
     private void addPlayerInventory(Inventory playerInventory) {

@@ -1,50 +1,102 @@
 ![Growthcraft Trapper](https://raw.githubusercontent.com/GrowthcraftCE/Growthcraft-Trapper/1.16/src/main/resources/growthcraft_fishtrap_logo.png)
 
-# Growthcraft Trapper 1.20.4 for Minecraft 1.20.4 (NeoForge)
+# Growthcraft Trapper
 
-[![Version](https://img.shields.io/badge/Growthcraft_Trapper-1.20.4.1-orange.svg)](https://github.com/GrowthcraftCE/Growthcraft-Trapper)
-[![](http://cf.way2muchnoise.eu/versions/growthcraft-community-edition_latest.svg)](https://minecraft.curseforge.com/projects/growthcraft-community-edition/)
-[![](http://cf.way2muchnoise.eu/short_growthcraft-community-edition.svg)](https://minecraft.curseforge.com/projects/growthcraft-community-edition/)
-[![Discord](https://img.shields.io/discord/333690296334548994.svg?color=green)](https://discord.gg/Quh76Jn)
+[![Version](https://img.shields.io/badge/version-1.21.1.1-orange.svg)](https://github.com/GrowthcraftCE/Growthcraft-Trapper)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-62b47a.svg)](https://www.minecraft.net/)
+[![NeoForge](https://img.shields.io/badge/NeoForge-21.1.x-yellow.svg)](https://neoforged.net/)
+[![CurseForge](https://cf.way2muchnoise.eu/short_growthcraft-trapper.svg)](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper)
+[![Discord](https://img.shields.io/discord/333690296334548994.svg?label=Discord&color=5865f2)](https://discord.gg/Quh76Jn)
 
-Welcome to Growthcraft Trapper. This Minecraft mod adds the skill of trapping to the game. This was originally included
-in the Growthcraft series, however, do to requests we have moved it its own stand alone mod. This will also allow us to
-be able to maintain and update it quicker. It all started with a simple over-powered block called the Fishtrap. Now that
-it is its own mod, we are extending it to more than just fish.
+Growthcraft Trapper adds passive resource traps to Minecraft. Supply a trap with the right bait, leave it working, and
+return later to collect fish, animal drops, or even passive-animal spawn eggs.
 
-[Growthcraft Master Roadmap](https://app.zenhub.com/workspaces/growthcraft-6043ce571b094900102f4ca6/board)
+Traps continue consuming bait while they operate. If every output slot is full, newly caught loot is lost. Empty traps
+regularly or place a hopper underneath to collect their output automatically.
 
-### Curse Forge
-* [Growthcraft Trapper](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper)
+The mod began with Growthcraft's original Fishtrap and is now maintained as a standalone mod. Growthcraft is not
+required.
 
-### Minecraft 1.20
-* [Growthcraft Trapper 1.20.4-neo](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.20.4-neo)
+## Traps and Bait
 
-### Minecraft 1.19
-* [Growthcraft Trapper](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper)
+### Fishtraps
 
-### Minecraft 1.19
-* [Growthcraft Trapper 8](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.19)
-* End of Support: TBD
+Fishtraps are available in every vanilla wood type. Place one in a suitable water location and put bait in its input
+slot.
 
-### Mineraft 1.18
+| Bait | Loot category | Examples |
+| --- | --- | --- |
+| Cod, salmon, tropical fish, or bread | Normal | Cod, salmon, tropical fish, and pufferfish |
+| Rotten flesh, pufferfish, or tripwire hook | Fortune | Name tags, saddles, enchanted gear, and nautilus shells |
+| Other bait | Junk | Lily pads, leather, bones, string, and other fishing junk |
 
-* [Growthcraft Trapper 7](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.18)
-* End of Support: TBD
+Fortune bait applies the equivalent of Luck of the Sea III. Hover over the filter icon in the trap GUI to see the loot
+category selected by the current bait.
 
-### Minecraft 1.16
+### Animal Traps
 
-* [Growthcraft Trapper 5](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.16)
-* End of Support: December 31, 2022
+Animal traps turn common animal food into renewable mob drops without spawning or killing an entity in the world.
 
-### Minecraft 1.15
+| Bait | Expected loot |
+| --- | --- |
+| Wheat | Beef or leather |
+| Carrots | Porkchops or rabbit drops |
+| Wheat seeds | Chicken, feathers, or eggs |
+| Leaves | Mutton or colored wool |
 
-* [Growthcraft Trapper 4](https://github.com/GrowthcraftCE/Growthcraft-Trapper/tree/1.15)
-* End of Support: July 1, 2021
+Animal traps are available in several material tiers. Their GUI tooltip shows which loot pool the current bait selects.
 
-## Contributing
+### Netherite Animal Trap
 
-If you'd like to contribute to Growthcraft Trapper, open up a GitHub issue and describe what you are working on. This
-way we will not be duplicating efforts. If possible, always add to both the latest supported reposiories. If you have
-any questions, reach out to us on [Discord](https://discord.com/channels/333690296334548994/333690296334548994)
+The Netherite Animal Trap accepts wheat and has a chance to produce cow, sheep, or goat spawn eggs. Its tooltip lists
+the expected results when valid bait is present.
 
+## Support
+
+- Report bugs or request features through [GitHub Issues](https://github.com/GrowthcraftCE/Growthcraft-Trapper/issues).
+- Join the [Growthcraft Discord](https://discord.gg/Quh76Jn) for discussion and help.
+- Download published releases from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper).
+
+When reporting a problem, include the Minecraft, NeoForge, and Growthcraft Trapper versions along with the relevant
+`latest.log` or crash report.
+
+## Version History
+
+| Minecraft | Loader | Latest Trapper version | Status |
+| --- | --- | --- | --- |
+| 1.21.1 | NeoForge | 1.21.1.1 | In development |
+| 1.20.6 | NeoForge | 1.20.6.1 | Released |
+| 1.20.4 | NeoForge | 1.20.4.1-neo | Released |
+| 1.20.4 | Forge | 1.20.4.1 | Released |
+| 1.20.1 | Forge | 9.0.2 | Released |
+
+Older versions remain available from the project's
+[CurseForge files](https://www.curseforge.com/minecraft/mc-mods/growthcraft-trapper/files/all) and Git history.
+
+## Contributing and Development
+
+Before starting a change, open or comment on a GitHub issue so work is not duplicated. Keep changes targeted to the
+appropriate Minecraft version branch.
+
+Requirements:
+
+- Java 21
+- The included Gradle Wrapper
+- A Minecraft 1.21.1-compatible IDE
+
+Useful commands:
+
+```powershell
+.\gradlew.bat compileJava
+.\gradlew.bat processResources
+.\gradlew.bat runClient
+.\gradlew.bat runServer
+.\gradlew.bat runData
+```
+
+This project uses NeoForge ModDev. IntelliJ run configurations are prepared when the Gradle project is reloaded; the
+equivalent command-line synchronization task is `neoForgeIdeSync`.
+
+## License
+
+Growthcraft Trapper is licensed under the [GNU General Public License v3.0](LICENSE.txt).

@@ -19,6 +19,8 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class AnimalTrapMenu extends AbstractContainerMenu {
 
+    private static final int BAIT_SLOT_INDEX = 36;
+
     private final AnimalTrapBlockEntity trapBlockEntity;
     private final AnimalTrapBlock trapBlock;
 
@@ -104,7 +106,6 @@ public class AnimalTrapMenu extends AbstractContainerMenu {
                 return ItemStack.EMPTY;
             }
         } else {
-            System.out.println("Invalid slotIndex:" + index);
             return ItemStack.EMPTY;
         }
         // If stack size == 0 (the entire stack was moved) set slot contents to null
@@ -127,6 +128,10 @@ public class AnimalTrapMenu extends AbstractContainerMenu {
                 player,
                 this.trapBlock
         );
+    }
+
+    public ItemStack getBaitStack() {
+        return getSlot(BAIT_SLOT_INDEX).getItem();
     }
 
     private void addPlayerInventory(Inventory playerInventory) {
